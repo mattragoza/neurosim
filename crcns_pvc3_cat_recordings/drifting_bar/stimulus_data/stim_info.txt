@@ -1,0 +1,12 @@
+# metadata for: 71 - track 7c driftbars.srf, auto-generated on 26/11/2007 6:42:35 PM.
+# source datafile digital records: 0-115199.
+frm_filename        = 'drifting_bar.din'
+timestamp_precision = 4E-5
+resolution          = 16
+value_datatype      = 'int64'
+encoding            = 'binary'
+byteorder           = 'little_endian'
+timestamp_datatype  = 'int64'
+units               = 's'
+units_multiplier    = 1E-6
+nsamples            = 115200
