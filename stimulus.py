@@ -1,4 +1,5 @@
 import numpy
+import math
 
 def circle(n, radius, solid=False, center=None, width=1):
     """Make an `n` by `n` array with a circle of radius `radius`.
@@ -16,4 +17,17 @@ def circle(n, radius, solid=False, center=None, width=1):
             if fill(i, j):
                 canvas[i, j] = 1.0
     return canvas
+
+
+def rotating(size, n_frames, degrees_per_frame, width=1.0):
+    angle = 0
+    for f in range(n_frames):
+        canvas = numpy.zeros((size, size))
+        a, b = math.acos(angle), math.asin(angle)
+        denom = (a * a + b * b) ** .5
+        for i, row in enumerate(canvas):
+            for j, pt in enumerate(row):
+                if abs(a * x + b * y) / denom < width:
+                    canvas[i, j] = 1.0
+        yield canvas
 
