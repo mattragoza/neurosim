@@ -1,6 +1,11 @@
 import numpy
 import math
 
+
+def zeros(n):
+
+    return numpy.zeros((n, n))
+
 def circle(n, radius, solid=False, center=None, width=1):
     """Make an `n` by `n` array with a circle of radius `radius`.
     Ignores width if solid is true.
