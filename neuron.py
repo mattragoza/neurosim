@@ -1,10 +1,14 @@
 import numpy as np
 import math
 
+
 class Neuron:
+
     def __init__(self, base_rate, max_rate, rec_field, alpha=0.5, init_weights=None):
+
         self.base_rate = base_rate
         self.firing_rate = base_rate
+        self.rec_field = rec_field
         self.ouput = [] #other neurons this neuron connects TO
         self.inputs = [] #neurons that connect to this neuron
         self.alpha = alpha
@@ -16,26 +20,19 @@ class Neuron:
             
     def update_firing_rate(self, stim):
 
-        res = np.dot(np.reshape(self.weights, -1), np.reshape(stim, -1))
-        new_rate = sigmoid(res)*(self.max_rate - self.base_rate) + self.base_rate
-        weighted_rate = (1-self.alpha)*new_rate + self.alpha*(self.firing_rate) #prob not best way to do this
+        input_sum = np.dot(self.weights.reshape(-1), stim.reshape(-1))
+        new_rate = sigmoid(input_sum)*(self.max_rate - self.base_rate) + self.base_rate
+        self.firing_rate = (1-self.alpha)*new_rate + self.alpha*(self.firing_rate)
 
-        self.firing_rate = weighted_rate #no sigmoid yet
-        print('fr: ', self.firing_rate)
-#         if updated_rate >= 0:
-#             self.firing_rate = updated_rate
-#         else:
-#             self.firing_rate = 0
 
 def sigmoid(x):
   return 2*(1 / (1 + math.exp(-x)) - 0.5)
 
 
-
-rec_field = 3
-x = np.random.random((rec_field, rec_field)) #this is the input stimulus for now
-
 if __name__ == '__main__':
+
+    rec_field = 3
+    x = np.random.random((rec_field, rec_field)) #this is the input stimulus for now
     test_neuron = Neuron(70, 100, rec_field)
     for i in range(10):
         test_neuron.update_firing_rate(x)
