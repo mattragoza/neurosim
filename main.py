@@ -1,3 +1,5 @@
+'''usage: python main.py <rec_field> <bar_width> <angle>'''
+import sys
 import neuron
 import stimulus
 import numpy as np
@@ -7,30 +9,31 @@ np.random.seed(0)
 
 if __name__ == '__main__':
 
-	n = neuron.Neuron(base_rate=10, max_rate=20, rec_field=100)
-	n.weights = next(stimulus.rotating_bar(n.rec_field, 1, 0, angle=0, width=10, norm=False))
+	try:
+		rec_field, width, deg, = map(int, sys.argv[1:])
+	except:
+		sys.exit(__doc__)
+
+	rad = 2*np.pi * deg/360
+
+	# init weights as an excitatory angled bar with an inhibitory border
+	weights = 3*next(stimulus.rotating_bar(rec_field, 1, 0, width, rad)) \
+		- 2*next(stimulus.rotating_bar(rec_field, 1, 0, 2*width, rad))
+
+	n = neuron.Neuron(0, 100, rec_field, init_weights=weights)
 
 	rate_x, rate_y = [], []
 	t = 0
 
-	for i in range(20):
-		n.update_firing_rate(stimulus.zeros(n.rec_field))
-		rate_x.append(t)
-		rate_y.append(n.firing_rate)
-		t += 1
-
-	for bar in stimulus.rotating_bar(n.rec_field, 60, 2*np.pi/60, width=10, norm=True):
+	for bar in stimulus.rotating_bar(rec_field, 360, 2*np.pi/360, width=width, norm=True):
 		n.update_firing_rate(bar)
 		rate_x.append(t)
 		rate_y.append(n.firing_rate)
 		t += 1
 
-	for i in range(20):
-		n.update_firing_rate(stimulus.zeros(n.rec_field))
-		rate_x.append(t)
-		rate_y.append(n.firing_rate)
-		t += 1
-
 	plt.plot(rate_x, rate_y)
-	plt.ylim(n.base_rate-5, n.max_rate+5)
+	plt.xlabel('Time, Stimulus angle')
+	plt.ylabel('Firing rate')
+	plt.xlim(0, 360)
+	plt.ylim(-n.max_rate, n.max_rate)
 	plt.show()
