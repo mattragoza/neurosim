@@ -6,7 +6,7 @@ def zeros(n):
 
     return numpy.zeros((n, n))
 
-def circle(n, radius, solid=False, center=None, width=1, norm=True):
+def circle(n, radius, solid=False, center=None, width=1, norm=False):
     """Make an `n` by `n` array with a circle of radius `radius`.
     Ignores width if solid is true.
     Defaults to centering in the middle, and width 1"""
@@ -27,7 +27,7 @@ def circle(n, radius, solid=False, center=None, width=1, norm=True):
         return canvas
 
 
-def rotating_bar(size, n_frames, rads_per_frame, width=1, angle=0, norm=True):
+def rotating_bar(size, n_frames, rads_per_frame, width=1, angle=0, norm=False):
 
     for f in range(n_frames):
         canvas = numpy.zeros((size, size))
