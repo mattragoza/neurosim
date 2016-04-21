@@ -21,6 +21,8 @@ class Neuron:
             self.weights = init_weights
         else:
             raise ValueError("init_weights shape must match rec_field")
+
+        self.spiked = False
             
     def update_firing_rate(self, stim):
 
@@ -35,7 +37,8 @@ class Neuron:
         # rate weighted by the alpha parameter
         self.firing_rate = (1-self.alpha)*new_rate + self.alpha*self.firing_rate
 
-        return self.firing_rate
+        self.spiked = np.random.random() < self.firing_rate
+
 
 
 def sigmoid(x, y_mid=0.5, y_range=1.0):
