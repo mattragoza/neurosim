@@ -1,39 +1,63 @@
-'''usage: python main.py <rec_field> <bar_width> <angle>'''
+'''usage: python main.py'''
 import sys
 import neuron
 import stimulus
 import numpy as np
 import matplotlib.pyplot as plt
 
-np.random.seed(0)
+np.random.seed()
 
 if __name__ == '__main__':
+	
+	dt = 1e-3 # ms
+	total_t = 360
 
-	try:
-		rec_field, width, deg, = map(int, sys.argv[1:])
-	except:
-		sys.exit(__doc__)
+	stim_size, bar_width = 15, 3
+	stim = stimulus.rotating_bar(stim_size, total_t, 2*np.pi/total_t,
+		width=bar_width)
 
-	rad = 2*np.pi * deg/360
+	base_rate = 218 * dt # Hz
+	max_rate  = 351 * dt # Hz
+	min_rate  = base_rate - (max_rate-base_rate)
 
-	# init weights as an excitatory angled bar with an inhibitory border
-	weights = 3*next(stimulus.rotating_bar(rec_field, 1, 0, width, rad)) \
-		- 2*next(stimulus.rotating_bar(rec_field, 1, 0, 2*width, rad))
+	stim_shape = (stim_size, stim_size)
 
-	n = neuron.Neuron(0, 100, rec_field, init_weights=weights)
+	input_layer = []
+	for i in range(3):
+		for j in range(3):
+			center = (2+5*j,2+5*i)
+			n = neuron.Neuron(base_rate, max_rate, stim_shape)
+			n.weights = 3*stimulus.circle(stim_size, 2, True, center) \
+					    - stimulus.circle(stim_size, 4, True, center)
+			input_layer.append(n)
 
-	rate_x, rate_y = [], []
-	t = 0
+	nout = neuron.Neuron(base_rate, max_rate, (9,))
+	nout.set_inputs(input_layer)
+	nout.weights = np.array([ 0,-99,  0,
+							 99,  0, 99,
+							  0,-99,  0])
 
-	for bar in stimulus.rotating_bar(rec_field, 360, 2*np.pi/360, width=width, norm=True):
-		n.update_firing_rate(bar)
-		rate_x.append(t)
-		rate_y.append(n.firing_rate)
-		t += 1
+	nxx = nout
+	print(nxx.weights)
 
-	plt.plot(rate_x, rate_y)
-	plt.xlabel('Time, Stimulus angle')
+	x, y, spike_times = [], [], []
+	for t, s in enumerate(stim):
+
+		for n in nout.inputs:
+			n.update_firing_rate(s)
+		nout.update_firing_rate()
+
+		y.append(nxx.firing_rate)
+		if nxx.spiked:
+			spike_times.append(t)
+
+		x.append(t)
+
+	plt.plot(x, y, color=(0.9,0.9,0.9))
+	plt.vlines(spike_times, base_rate+0.25*(max_rate-base_rate),
+		                    base_rate-0.25*(max_rate-base_rate))
+	plt.xlabel('Time (ms)')
 	plt.ylabel('Firing rate')
-	plt.xlim(0, 360)
-	plt.ylim(-n.max_rate, n.max_rate)
+	plt.xlim(0, total_t)
+	plt.ylim(min_rate, max_rate)
 	plt.show()
