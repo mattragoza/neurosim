@@ -22,6 +22,8 @@ if __name__ == '__main__':
     dof = n_bins - 2
     chi_crit = 22.362 #for this set of parameters
     
+    all_isi = []
+    
     print "Running Chi-Squared for Exponential at 95% significance..."
     print
     for i, spike_file in enumerate(glob.glob(path + "/*.spk")):
@@ -38,8 +40,12 @@ if __name__ == '__main__':
         hist, _ = np.histogram(rand_vals, bin_ranges)
         exp = np.ones(len(hist)) * n_samples/float(n_bins)
         chisq, p = stats.chisquare(hist, exp, ddof = dof)
-    
+        
+        print chisq
         if chisq < chi_crit:
             print "PASSED"
         else:
             print "FAILED"
+        
+        all_isi.append(np.mean(isi))
+print 1/(np.mean(all_isi))
